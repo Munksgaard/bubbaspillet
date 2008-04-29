@@ -63,40 +63,57 @@ def load_sound(file):
 
 
 class Player(pygame.sprite.Sprite):
-    speed = 10
-    bounce = 24
-    gun_offset = -11
-    images = []
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self, self.containers)
-        self.image = self.images[0]
-        self.rect = self.image.get_rect(midbottom=SCREENRECT.midbottom)
-        self.reloading = 0
-        self.origtop = self.rect.top
-        self.facing = -1
+	speed = 10
+	bounce = 24
+	gun_offset = -11
+	images = []
+	def __init__(self):
+		pygame.sprite.Sprite.__init__(self, self.containers)
+		self.image = self.images[0]
+		self.rect = self.image.get_rect(midbottom=SCREENRECT.midbottom)
+		self.reloading = 0
+		self.origtop = self.rect.top
+		self.facing = -1
 
-    def move(self, direction):
-        if direction: self.facing = direction
-        self.rect.move_ip(direction*self.speed, 0)
-        self.rect = self.rect.clamp(SCREENRECT)
-        if direction < 0:
-            self.image = self.images[0]
-        elif direction > 0:
-            self.image = self.images[1]
-        self.rect.top = self.origtop - (self.rect.left/self.bounce%2)
+	def move(self, direction):
+		if direction: self.facing = direction
+		self.rect.move_ip(direction*self.speed, 0)
+		self.rect = self.rect.clamp(SCREENRECT)
+		if self.reloading:
+			if self.facing < 0:
+				self.image = self.images[2]
+			elif self.facing > 0:
+				self.image = self.images[3]
+		else:
+			if self.facing < 0:
+				self.image = self.images[0]
+			elif self.facing > 0:
+				self.image = self.images[1]
+		self.rect.top = self.origtop - (self.rect.left/self.bounce%2)
 
-    def gunpos(self):
-        pos = self.facing*self.gun_offset + self.rect.centerx
-        return pos, self.rect.top
+	def gunpos(self):
+		pos = self.facing*self.gun_offset + self.rect.centerx
+		return pos, self.rect.top
 
-    def shoot(self):
-	if self.facing:
-	    self.image = pygame.transform.flip(self.image_shoot, 1, 0)
-	else:
-	    self.image = self.image_shoot		
-	self.shoot_trigger = 1
-
-
+	def shoot(self):
+		print self.facing
+		if self.facing < 0:
+			self.image = self.images[2]
+		elif self.facing > 0:
+			self.image = self.images[3]
+	
+	def update(self):
+		if self.reloading:
+			if self.facing < 0:
+				self.image = self.images[2]
+			elif self.facing > 0:
+				self.image = self.images[3]
+		else:
+			if self.facing < 0:
+				self.image = self.images[0]
+			elif self.facing > 0:
+				self.image = self.images[1]
+		
 class Alien(pygame.sprite.Sprite):
     speed = 13
     animcycle = 12
@@ -221,7 +238,8 @@ def main(winstyle = 0):
     #Load images, assign to sprite classes
     #(do this before the classes are used, after screen setup)
     img = load_image('bubba.gif')
-    Player.images = [img, pygame.transform.flip(img, 1, 0)]
+    img2 = load_image('bubba_shoot.gif')
+    Player.images = [img, pygame.transform.flip(img, 1, 0), img2, pygame.transform.flip(img2, 1, 0)]
     img = load_image('explosion1.gif')
     Explosion.images = [img, pygame.transform.flip(img, 1, 1)]
     Alien.images = load_images('brady.gif')
@@ -307,6 +325,7 @@ def main(winstyle = 0):
             Shot(player.gunpos())
             shoot_sound.play()
             total_shots+= 1
+            player.shoot()
         player.reloading = firing
 
         # Create new alien
@@ -381,4 +400,4 @@ if __name__ == '__main__':
 			foobar = 0
 		SCORE = 0
 		print
-		print "Nyt spil"
+		print "Nyt spil:"
