@@ -380,3 +380,5 @@ if __name__ == '__main__':
 		else:
 			foobar = 0
 		SCORE = 0
+		print
+		print "Nyt spil"
