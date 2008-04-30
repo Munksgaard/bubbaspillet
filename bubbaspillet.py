@@ -96,7 +96,6 @@ class Player(pygame.sprite.Sprite):
 		return pos, self.rect.top
 
 	def shoot(self):
-		print self.facing
 		if self.facing < 0:
 			self.image = self.images[2]
 		elif self.facing > 0:
@@ -318,7 +317,7 @@ def main(winstyle = 0):
         #handle player input
         direction = keystate[K_RIGHT] - keystate[K_LEFT]
         player.move(direction)
-        firing = keystate[K_SPACE]
+        firing = keystate[K_SPACE] or keystate[K_UP]
         if firing:
         	keypresses += 1
         if not player.reloading and firing and len(shots) < MAX_SHOTS:
@@ -375,6 +374,7 @@ if __name__ == '__main__':
 	foobar = 1	
 	while foobar:
 		feedback = main()
+		print "Nyt spil:"
 		print "Antal dræbte Brady'er: " + str(SCORE)
 		print "Antal tastetryk: " + str(keypresses)
 		print "Antal skud: " + str(total_shots)
@@ -399,5 +399,4 @@ if __name__ == '__main__':
 		else:
 			foobar = 0
 		SCORE = 0
-		print
-		print "Nyt spil:"
+                print
